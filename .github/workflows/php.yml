@@ -36,17 +36,17 @@ jobs:
     - name: Setup PHP with Xdebug
       uses: shivammathur/setup-php@v2
       with:
-      	  php-version: '8.2'
-          coverage: xdebug
+        php-version: '8.2'
+        coverage: xdebug
     
     
     - name: PHPUnit tests
       uses: php-actions/phpunit@v3
       with:
-          php_extensions: "xdebug"
-          coverage_clover: "coverage/clover.xml"
+        php_extensions: "xdebug"
+        coverage_clover: "coverage/clover.xml"
       env:
-          XDEBUG_MODE: coverage
+        XDEBUG_MODE: coverage
            
     - name: Ejecutar tests
       run: composer run-script test
