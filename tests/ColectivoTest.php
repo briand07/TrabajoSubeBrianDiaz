@@ -4,10 +4,10 @@ namespace TrabajoSube;
 
 use PHPUnit\Framework\TestCase;
 
-
 class ColectivoTest extends TestCase{
-    public function testVerdadero()
-    {
-        $this->assertTrue(true);
+
+    public function testGetlinea(){
+        $cole = new Colectivo(103);
+        $this->assertEquals($cole->getLinea(), 103);
     }
 }
