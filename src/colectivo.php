@@ -1,8 +1,4 @@
-<?php 
-
-namespace TrabajoSube;
-
-use PHPUnit\Framework\TestCase;
+<?php
 
 class Colectivo {
     public $tarifaBasica = 120;
