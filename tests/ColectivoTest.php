@@ -3,6 +3,7 @@
 namespace TrabajoSube;
 
 use PHPUnit\Framework\TestCase;
+use TrabajoSube;
 
 class ColectivoTest extends TestCase{
 
