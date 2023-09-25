@@ -4,8 +4,6 @@ namespace TrabajoSube;
 
 use PHPUnit\Framework\TestCase;
 
-use TrabajoSube\colectivo;
-
 class ColectivoTest extends TestCase{
 
     public function testGetlinea(){
