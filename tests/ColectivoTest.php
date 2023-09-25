@@ -4,6 +4,8 @@ namespace TrabajoSube;
 
 use PHPUnit\Framework\TestCase;
 
+use TrabajoSube\Colectivo;
+
 class ColectivoTest extends TestCase{
 
     public function testGetlinea(){
@@ -11,5 +13,3 @@ class ColectivoTest extends TestCase{
         $this->assertEquals($cole->getLinea(), 103);
     }
 }
-
-Echo "Hola mundo!";
