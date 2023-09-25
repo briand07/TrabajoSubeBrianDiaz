@@ -11,5 +11,3 @@ class ColectivoTest extends TestCase{
         $this->assertEquals($cole->getLinea(), 103);
     }
 }
-
-echo "Hola, mundo!";
