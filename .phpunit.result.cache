@@ -1,1 +1,1 @@
-{"version":1,"defects":{"TrabajoSube\\ColectivoTest::testVerdadero":7},"times":{"TrabajoSube\\ColectivoTest::testVerdadero":0.006,"TrabajoSube\\ColectivoTest::testExitoso":0.005,"TrabajoSube\\ColectivoTest::testGetlinea":0.384}}
+{"version":1,"defects":{"TrabajoSube\\ColectivoTest::testVerdadero":7},"times":{"TrabajoSube\\ColectivoTest::testVerdadero":0.006,"TrabajoSube\\ColectivoTest::testExitoso":0.005,"TrabajoSube\\ColectivoTest::testGetlinea":0.007}}
