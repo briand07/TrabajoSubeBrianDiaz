@@ -3,9 +3,8 @@
 namespace TrabajoSube;
 
 use PHPUnit\Framework\TestCase;
-use TrabajoSube;
 
-class ColectivoTest{
+class ColectivoTest extends TestCase{
 
     public function testGetlinea(){
         $cole = new Colectivo(103);
