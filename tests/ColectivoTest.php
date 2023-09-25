@@ -4,6 +4,8 @@ namespace TrabajoSube;
 
 use PHPUnit\Framework\TestCase;
 
+use TrabajoSube;
+
 class Colectivo{
     protected $linea;
     
