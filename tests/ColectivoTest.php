@@ -5,19 +5,6 @@ namespace TrabajoSube;
 use PHPUnit\Framework\TestCase;
 use TrabajoSube\colectivo;
 
-class Colectivo {
-    private $tarifaBasica = 120;
-
-    public function pagarCon(Tarjeta $tarjeta) {
-        if ($tarjeta->getSaldo() >= $this->tarifaBasica) {
-            $tarjeta->descontarSaldo($this->tarifaBasica);
-            return new Boleto($this->tarifaBasica);
-        } else {
-            return null; // No hay suficiente saldo en la tarjeta
-        }
-    }
-}
-
 class Tarjeta {
     private $saldo;
     private $limiteSaldo = 6600;
