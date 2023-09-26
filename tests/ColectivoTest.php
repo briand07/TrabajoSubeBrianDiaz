@@ -3,7 +3,7 @@
 namespace TrabajoSube;
 
 use PHPUnit\Framework\TestCase;
-use TrabajoSube\Colectivo;
+use TrabajoSube\colectivo;
 
 class ColectivoTest extends TestCase{
 
@@ -13,4 +13,4 @@ class ColectivoTest extends TestCase{
     }
 }
 
-echo "Hola, mundo!    \n";
+echo "Hola, mundo!  \n";
