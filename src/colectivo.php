@@ -1,14 +1,16 @@
 <?php
+
 namespace TrabajoSube;
-class Colectivo{
-    protected $linea;
-    
-    public function __construct($linea){
-        $this->linea = $linea;
-    }
-    
-    //    Funcion de ejemplo para test
-    public function getLinea(){
-        return $this->linea;
+
+class Colectivo {
+    private $tarifaBasica = 120;
+
+    public function pagarCon(Tarjeta $tarjeta) {
+        if ($tarjeta->getSaldo() >= $this->tarifaBasica) {
+            $tarjeta->descontarSaldo($this->tarifaBasica);
+            return new Boleto($this->tarifaBasica);
+        } else {
+            return null; // No hay suficiente saldo en la tarjeta
+        }
     }
 }
