@@ -85,5 +85,3 @@ if ($boleto !== null) {
 } else {
     echo "No hay suficiente saldo en la tarjeta para pagar el pasaje." . PHP_EOL;
 }
-
-?>
