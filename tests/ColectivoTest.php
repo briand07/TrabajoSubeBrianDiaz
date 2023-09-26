@@ -13,4 +13,4 @@ class ColectivoTest extends TestCase{
     }
 }
 
-echo "Hola, mundo!";
+echo "Hola, mundo! \n";
