@@ -5,6 +5,14 @@ namespace TrabajoSube;
 use PHPUnit\Framework\TestCase;
 use TrabajoSube\colectivo;
 
+class ColectivoTest extends TestCase{
+
+    public function testGetlinea(){
+        $cole = new Colectivo(103);
+        $this->assertEquals($cole->getLinea(), 103);
+    }
+}
+
 class Tarjeta {
     private $saldo;
     private $limiteSaldo = 6600;
