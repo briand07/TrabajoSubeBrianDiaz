@@ -5,7 +5,6 @@ namespace TrabajoSube;
 use PHPUnit\Framework\TestCase;
 use TrabajoSube\colectivo;
 
-<?php
 class Colectivo {
     private $tarifaBasica = 120;
 
