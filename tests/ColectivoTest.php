@@ -7,25 +7,25 @@ use TrabajoSube\colectivo;
 use TrabajoSube\Tarjeta;
 use TrabajoSube\Boleto;
 
-class ColectivoTest extends TestCase{}
+class ColectivoTest extends TestCase {
+    public function testPagarConSuficienteSaldo() {
+        $tarjeta = new Tarjeta(500); // Cargar una tarjeta con $500 de saldo
+        $colectivo = new Colectivo();
 
+        $boleto = $colectivo->pagarCon($tarjeta);
 
-$tarjeta = new Tarjeta(500); // Cargar una tarjeta con $500 de saldo
-echo "Saldo inicial en la tarjeta: $" . $tarjeta->getSaldo() . PHP_EOL;
+        $this->assertInstanceOf(Boleto::class, $boleto);
+        $this->assertEquals(120, $boleto->getMonto());
+        $this->assertEquals(380, $tarjeta->getSaldo());
+    }
 
-$tarjeta->cargarSaldo(300); // Cargar $300 de saldo
-$tarjeta->cargarSaldo(1000); // Cargar $1000 de saldo
-$tarjeta->cargarSaldo(2000); // Cargar $2000 de saldo
-$tarjeta->cargarSaldo(4000); // Intentar cargar $5000 de saldo (supera el límite)
+    public function testPagarSinSaldoSuficiente() {
+        $tarjeta = new Tarjeta(100); // Cargar una tarjeta con $100 de saldo
+        $colectivo = new Colectivo();
 
-echo "Saldo actual en la tarjeta: $" . $tarjeta->getSaldo() . PHP_EOL;
+        $boleto = $colectivo->pagarCon($tarjeta);
 
-$colectivo = new Colectivo();
-
-$boleto = $colectivo->pagarCon($tarjeta);
-if ($boleto !== null) {
-    echo "Se ha realizado el pago de $" . $boleto->getMonto() . " correctamente." . PHP_EOL;
-    echo "Saldo restante en la tarjeta: $" . $tarjeta->getSaldo() . PHP_EOL;
-} else {
-    echo "No hay suficiente saldo en la tarjeta para pagar el pasaje." . PHP_EOL;
+        $this->assertNull($boleto);
+        $this->assertEquals(100, $tarjeta->getSaldo());
+    }
 }
