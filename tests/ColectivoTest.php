@@ -6,6 +6,7 @@ use PHPUnit\Framework\TestCase;
 use TrabajoSube\colectivo;
 use TrabajoSube\Tarjeta;
 use TrabajoSube\Boleto;
+use Exception;
 
 class ColectivoTest extends TestCase {
     public function testPagarConSuficienteSaldo() {
