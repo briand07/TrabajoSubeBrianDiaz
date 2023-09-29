@@ -7,7 +7,7 @@ use TrabajoSube\colectivo;
 use TrabajoSube\comida;
 use TrabajoSube\Boleto;
 
-class ColectivoTest extends TestCase{
+class ColectivoTest extends TestCase{}
 
     $tarjeta = new Tarjeta(500); // Cargar una tarjeta con $500 de saldo
 echo "Saldo inicial en la tarjeta: $" . $tarjeta->getSaldo() . PHP_EOL;
@@ -27,5 +27,4 @@ if ($boleto !== null) {
     echo "Saldo restante en la tarjeta: $" . $tarjeta->getSaldo() . PHP_EOL;
 } else {
     echo "No hay suficiente saldo en la tarjeta para pagar el pasaje." . PHP_EOL;
-}
 }
