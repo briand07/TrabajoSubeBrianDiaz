@@ -11,7 +11,7 @@ class Colectivo {
             return new Boleto($this->tarifaBasica);
         } else {
             echo "Saldo insuficiente";
-            return null;
+            return false;
         }
     }
 }
