@@ -36,3 +36,15 @@ class Tarjeta {
         }
     }
 }
+
+class MedioBoleto extends Tarjeta {
+    public function descontarSaldo($monto) {
+        parent::descontarSaldo($monto / 2);
+    }
+}
+
+class FranquiciaCompleta extends Tarjeta {
+    public function descontarSaldo($monto) {
+        parent::descontarSaldo(0);
+    }
+}
