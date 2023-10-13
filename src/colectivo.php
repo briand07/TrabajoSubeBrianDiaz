@@ -6,11 +6,10 @@ class Colectivo {
     private $tarifaBasica = 120;
 
     public function pagarCon(Tarjeta $tarjeta) {
-        if ($tarjeta->getSaldo() >= $this->tarifaBasica) {
+        if ($tarjeta->getSaldo() >= (-211.84 + $this->tarifaBasica)) {
             $tarjeta->descontarSaldo($this->tarifaBasica);
             return new Boleto($this->tarifaBasica);
         } else {
-            echo "Saldo insuficiente";
             return false;
         }
     }

@@ -10,23 +10,53 @@ use TrabajoSube\Boleto;
 class TarjetaTest extends TestCase {
 
     public function testPagarConSaldoSuficiente() {
-        $tarjeta = new Tarjeta(200); // Saldo suficiente
+        $tarjeta = new Tarjeta(150);
         $colectivo = new Colectivo();
 
         $boleto = $colectivo->pagarCon($tarjeta);
-
-        $this->assertInstanceOf(Boleto::class, $boleto);
+        
         $this->assertEquals(120, $boleto->getMonto());
-        $this->assertEquals(80, $tarjeta->getSaldo());
+        $this->assertEquals(30, $tarjeta->getSaldo());
+        
+        $boleto = $colectivo->pagarCon($tarjeta);
+        $boleto = $colectivo->pagarCon($tarjeta);
+        $boleto = $colectivo->pagarCon($tarjeta);
+        $boleto = $colectivo->pagarCon($tarjeta);
+        $this->assertEquals(-210, $tarjeta->getSaldo());
+        $this->assertEquals(False, $colectivo->pagarCon($tarjeta));
+        
     }
 
-    public function testPagarSinSaldoSuficiente() {
-        $tarjeta = new Tarjeta(50); // Saldo insuficiente
+    public function testSaldoMenor() {
+        $tarjeta = new Tarjeta(150); 
         $colectivo = new Colectivo();
 
         $boleto = $colectivo->pagarCon($tarjeta);
+        $boleto = $colectivo->pagarCon($tarjeta);
+        $boleto = $colectivo->pagarCon($tarjeta);
 
-        $this->assertFalse($boleto);
-        $this->assertEquals(50, $tarjeta->getSaldo());
+        $this->assertLessThan($tarjeta->getSaldo(), -211.84);
+    }
+
+    public function testDescuentoPlus() {
+        $tarjeta = new Tarjeta(150); 
+        $colectivo = new Colectivo();
+
+        $boleto = $colectivo->pagarCon($tarjeta);
+        $boleto = $colectivo->pagarCon($tarjeta);
+        $this->assertEquals(-90, $tarjeta->getSaldo());
+        $boleto = $colectivo->pagarCon($tarjeta);
+        $this->assertEquals(-210, $tarjeta->getSaldo());
+    }
+
+    public function testFanquiciaCompleta() {
+        $tarjeta = new FranquiciaCompleta(150); 
+        $colectivo = new Colectivo();
+
+        $boleto = $colectivo->pagarCon($tarjeta);
+        $boleto = $colectivo->pagarCon($tarjeta);
+        $this->assertEquals(-90, $tarjeta->getSaldo());
+        $boleto = $colectivo->pagarCon($tarjeta);
+        $this->assertEquals(-210, $tarjeta->getSaldo());
     }
 }
