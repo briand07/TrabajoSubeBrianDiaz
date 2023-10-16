@@ -2,9 +2,9 @@ name: PHP Composer
 
 on:
   push:
-    branches: [ "Iteración-3" ]
+    branches: [ "Iteración-4" ]
   pull_request:
-    branches: [ "Iteración-3" ]
+    branches: [ "Iteración-4" ]
 
 permissions:
   contents: read
