@@ -22,17 +22,38 @@ class Colectivo {
         $saldoPrevio = $tarjeta->getSaldo;
         $totalAbonado = $tarjeta->acreditarsaldo();
         $nuevoSaldo = $tarjeta->getSaldo;
-        if($saldoPrevio < 0 && $nuevoSaldo >= 0) {
-            $saldoNegativoCancelado = true;
+
+        if(time() - $tarjeta->getUltimoViaje >= 300 && $multiplicadorPrecio == 0.5){
+            if($saldoPrevio < 0 && $nuevoSaldo >= 0) {
+                $saldoNegativoCancelado = true;
+            }
+            else {
+                $saldoNegativoCancelado = false;
+            }
+            if ($tarjeta->getSaldo() >= ($this->saldoNegativo + $this->tarifaBasica * $multiplicadorPrecio)) {
+                $tarjeta->descontarSaldo($this->tarifaBasica * $multiplicadorPrecio);
+                $tarjeta->setUltimoViaje();
+                $tarjeta->sumarViaje();
+                return new Boleto($this->tarifaBasica, time(), $tarjeta->getTipotarjeta, $this->lineaColectivo, $totalAbonado, $tarjeta->getSaldo, $tarjeta->getId, $saldoNegativoCancelado);
+            } else {
+                return false;
+            }
         }
-        else {
-            $saldoNegativoCancelado = false;
-        }
-        if ($tarjeta->getSaldo() >= ($this->saldoNegativo + $this->tarifaBasica * $multiplicadorPrecio)) {
-            $tarjeta->descontarSaldo($this->tarifaBasica * $multiplicadorPrecio);
-            return new Boleto($this->tarifaBasica, time(), $tarjeta->getTipotarjeta, $this->lineaColectivo, $totalAbonado, $tarjeta->getSaldo, $tarjeta->getId, $saldoNegativoCancelado);
-        } else {
-            return false;
+        if ($multiplicadorPrecio != 0.5){
+            if($saldoPrevio < 0 && $nuevoSaldo >= 0) {
+                $saldoNegativoCancelado = true;
+            }
+            else {
+                $saldoNegativoCancelado = false;
+            }
+            if ($tarjeta->getSaldo() >= ($this->saldoNegativo + $this->tarifaBasica * $multiplicadorPrecio)) {
+                $tarjeta->descontarSaldo($this->tarifaBasica * $multiplicadorPrecio);
+                $tarjeta->setUltimoViaje();
+                $tarjeta->sumarViaje();
+                return new Boleto($this->tarifaBasica, time(), $tarjeta->getTipotarjeta, $this->lineaColectivo, $totalAbonado, $tarjeta->getSaldo, $tarjeta->getId, $saldoNegativoCancelado);
+            } else {
+                return false;
+            }
         }
     }
 }

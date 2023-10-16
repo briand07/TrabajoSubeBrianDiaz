@@ -6,6 +6,8 @@ class Tarjeta {
     private $id;
     private $saldo;
     private $saldoSinAcreditar;
+    private $ultimoViaje;
+    private $viajesHoy;
     protected $tipoTarjeta = "Sin Franquicia";
     private $limiteSaldo = 6600;
     private $cargasAceptadas = [150, 200, 250, 300, 350, 400, 450, 500, 600, 700, 800, 900, 1000, 1100, 1200, 1300, 1400, 1500, 2000, 2500, 3000, 3500, 4000];
@@ -27,8 +29,28 @@ class Tarjeta {
         return $this->saldo;
     }
 
+    public function getUltimoViaje() {
+        return $this->ultimoViaje;
+    }
+
     public function getSaldoSinAcreditar() {
         return $this->saldoSinAcreditar;
+    }
+
+    public function getViajesHoy() {
+        return $this->viajesHoy;
+    }
+
+    public function setUltimoViaje() {
+        $this->ultimoViaje = time();
+    }
+
+    public function resetViajesHoy() {
+        $this->viajesHoy = 0;
+    }
+
+    public function sumarViaje() {
+        $this->viajesHoy += 1;
     }
 
     public function descontarSaldo($monto) {
@@ -79,6 +101,16 @@ class FranquiciaCompleta extends Tarjeta {
     }
 
     public function multiplicadorPrecio() {
-        return 0;
+        if (floor(time()/86400) == floor($tarjeta->getUltimoViaje()/86400) && $tarjeta->getviajesHoy >= 2) {
+            return 1;
+        }
+        if(floor(time()/86400) > floor($tarjeta->getUltimoViaje()/86400))
+        {
+            resetViajesHoy();
+            return 0;
+        }
+        else {
+            return 0;
+        }
     }
 }
