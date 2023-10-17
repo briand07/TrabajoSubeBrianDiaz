@@ -57,3 +57,16 @@ class Colectivo {
         }
     }
 }
+
+
+class ColectivoInterurbano extends Colectivo
+{
+    // Tarifa para líneas interurbanas
+    private $tarifaInterurbana = 184;
+
+    public function __construct($lineaColectivo)
+    {
+        parent::__construct($lineaColectivo);
+        $this->tarifaBasica = 184;
+    }
+}

@@ -8,6 +8,7 @@ class Tarjeta {
     private $saldoSinAcreditar;
     private $ultimoViaje;
     private $viajesHoy;
+    private $viajesRealizados;
     protected $tipoTarjeta = "Sin Franquicia";
     private $limiteSaldo = 6600;
     private $cargasAceptadas = [150, 200, 250, 300, 350, 400, 450, 500, 600, 700, 800, 900, 1000, 1100, 1200, 1300, 1400, 1500, 2000, 2500, 3000, 3500, 4000];
@@ -55,6 +56,7 @@ class Tarjeta {
 
     public function descontarSaldo($monto) {
         $this->saldo -= $monto;
+        $this->viajesRealizados++;
     }
 
     public function cargarSaldo($monto) {
@@ -79,7 +81,13 @@ class Tarjeta {
     }
 
     public function multiplicadorPrecio() {
-        return 1;
+        if ($this->viajesRealizados >= 1 && $this->viajesRealizados <= 29) {
+            return 1;
+        } elseif ($this->viajesRealizados >= 30 && $this->viajesRealizados <= 79) {
+            return 0.8; 
+        } else {
+            return 0.75; 
+        }
     }
 }
 
