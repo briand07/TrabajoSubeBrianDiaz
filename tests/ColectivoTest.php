@@ -1,5 +1,5 @@
 <?php 
-
+/*
 namespace TrabajoSube;
 
 use PHPUnit\Framework\TestCase;
@@ -8,3 +8,4 @@ use TrabajoSube\tarjeta;
 use TrabajoSube\Boleto;
 
 class ColectivoTest extends TestCase{}
+*/
