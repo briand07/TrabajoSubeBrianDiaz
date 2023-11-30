@@ -5,56 +5,112 @@ namespace TrabajoSube;
 use PHPUnit\Framework\TestCase;
 use TrabajoSube\colectivo;
 use TrabajoSube\tarjeta;
+use TrabajoSube\tarjetaJ;
+use TrabajoSube\tarjetaBEG;
+use TrabajoSube\tarjetaMB;
 use TrabajoSube\Boleto;
 
 class ColectivoTest extends TestCase{
-   /* public function testPagarConSaldoSuficiente() {
-        $tarjeta = new Tarjeta(150);
-        $colectivo = new Colectivo(132);
+    public function testConstruct() {
+        $colectivo = new Colectivo(100);
+        $this->assertEquals($colectivo->lineaColectivo, 100);
 
-        $boleto = $colectivo->pagarCon($tarjeta,0);
-        
-        $this->assertEquals(120, $boleto->getMonto());
-        $this->assertEquals(30, $tarjeta->getSaldo());
-        
-        $boleto = $colectivo->pagarCon($tarjeta);
-        $boleto = $colectivo->pagarCon($tarjeta);
-        $boleto = $colectivo->pagarCon($tarjeta);
-        $boleto = $colectivo->pagarCon($tarjeta);
-        $this->assertEquals(-210, $tarjeta->getSaldo());
-        $this->assertEquals(False, $colectivo->pagarCon($tarjeta));
-        
-    }
-    public function testSaldoMenor() {
-        $tarjeta = new Tarjeta(150); 
-        $colectivo = new Colectivo(132);
 
-        $boleto = $colectivo->pagarCon($tarjeta);
-        $boleto = $colectivo->pagarCon($tarjeta);
-        $boleto = $colectivo->pagarCon($tarjeta);
 
-        $this->assertLessThan($tarjeta->getSaldo(), -211.84);
     }
 
-    public function testDescuentoPlus() {
-        $tarjeta = new Tarjeta(150); 
-        $colectivo = new Colectivo(132);
 
-        $boleto = $colectivo->pagarCon($tarjeta);
-        $boleto = $colectivo->pagarCon($tarjeta);
-        $this->assertEquals(-90, $tarjeta->getSaldo());
-        $boleto = $colectivo->pagarCon($tarjeta);
-        $this->assertEquals(-210, $tarjeta->getSaldo());
+
+    public function testTransbordos() {
+
+        $colectivo1 = new colectivo(100);
+        $colectivo2 = new colectivo(110);
+        $tarjeta = new tarjeta(4000);
+
+        // Transbordar 
+        $colectivo1->pagarCon($tarjeta, 43200);
+        $this->assertEquals($tarjeta->saldo, 3815);
+        $this->assertEquals($colectivo2->transBordos($tarjeta, 43200),0);
+        $colectivo2->pagarCon($tarjeta, 43200);
+        $this->assertEquals($tarjeta->saldo, 3815);
+
+        // Intentar transbordar cuando ya pasó una hora desde el ultimo viaje en colectivo.
+        $this->assertEquals($colectivo1->transBordos($tarjeta, 46800),1);
+        $colectivo1->pagarCon($tarjeta, 46800);
+        $this->assertEquals($tarjeta->saldo, 3630);
+
+        // Intentar transbordar entre colectivos de una misma linea.
+        $this->assertEquals($colectivo1->transBordos($tarjeta, 46800),1);
+        $colectivo1->pagarCon($tarjeta, 46800);
+        $this->assertEquals($tarjeta->saldo, 3445);
+
+        //Intentar transbordar fuera de horario.
+        $colectivo1->pagarCon($tarjeta, 86400);
+        $this->assertEquals($tarjeta->saldo, 3260);
+        $this->assertEquals($colectivo2->transBordos($tarjeta, 86400),1);
+        $colectivo2->pagarCon($tarjeta, 86400);
+        $this->assertEquals($tarjeta->saldo, 3075);
     }
 
-    public function testFanquiciaCompleta() {
-        $tarjeta = new FranquiciaCompleta(150); 
-        $colectivo = new Colectivo(132);
+    public function test5Min() {
 
-        $boleto = $colectivo->pagarCon($tarjeta);
-        $boleto = $colectivo->pagarCon($tarjeta);
-        $boleto = $colectivo->pagarCon($tarjeta);
-        $boleto = $colectivo->pagarCon($tarjeta);
-        $this->assertEquals(150, $tarjeta->getSaldo());
-    }*/
+        /* En esta función se va a testear el funcionamiento de check5Min. */
+
+        $colectivo = new colectivo(100);
+        $tarjeta = new TarjetaJ(4000);
+
+        $colectivo->pagarcon($tarjeta, 0);
+        $this->assertFalse($colectivo->verificar5Min($tarjeta,299));
+        $this->assertFalse($colectivo->verificar5Min($tarjeta,300));
+    }
+
+
+    public function testHorario() {
+
+        /* En esta función se va a testear el funcionamiento de checkHorarios. */
+
+        $colectivo = new colectivo(100);
+
+        $this->assertFalse($colectivo->validarTiempo(0));
+        $this->assertTrue($colectivo->validarTiempo(43200));
+    }
+
+    public function testViajesMes() {
+
+        /* En esta función se va a testear el funcionamiento de checkViajesMes y que la variable de ViajesMes 
+        se mantenga actualizada al pagar un boleto. */
+
+        $colectivo = new colectivo(100);
+        $tarjeta = new tarjeta(4000);
+
+        $colectivo->pagarCon($tarjeta, 0); // Mes 0
+        $this->assertEquals($tarjeta->viajesRealizados, 1);
+        $this->assertEquals($colectivo->aplicarDescuento($tarjeta, 0), 1);
+        $tarjeta->viajesRealizados = 40;
+        $this->assertEquals($colectivo->aplicarDescuento($tarjeta, 0), 0.8);
+        $tarjeta->viajesRealizados = 80;
+        $this->assertEquals($colectivo->aplicarDescuento($tarjeta, 0), 0.75);
+        $colectivo->pagarCon($tarjeta, 2678400); // Mes 1
+        $this->assertEquals($tarjeta->viajesRealizados, 1);
+        $this->assertEquals($colectivo->aplicarDescuento($tarjeta, 2678400), 1);
+    }
+
+    public function testViajesHoy() {
+
+        /* En esta función se va a testear el funcionamiento de checkViajesHoy y que la variable de ViajesHoy 
+        se mantenga actualizada al pagar un boleto. */
+
+        $colectivo = new colectivo(100);
+        $tarjeta = new tarjetaJ(4000);
+
+        $colectivo->pagarCon($tarjeta, 43200); //Día 0
+        $this->assertTrue($colectivo->viajesGratis($tarjeta, 43200));
+        $colectivo->pagarCon($tarjeta, 43200);
+        $this->assertFalse($colectivo->viajesGratis($tarjeta, 43200));
+        $colectivo->pagarCon($tarjeta, 43200);
+        $this->assertFalse($colectivo->viajesGratis($tarjeta, 43200));
+        $colectivo->pagarCon($tarjeta, 86400); //Día 1
+        $this->assertEquals($tarjeta->viajesHoy, 1);
+        $this->assertTrue($colectivo->viajesGratis($tarjeta, 86400));
+    }
 }

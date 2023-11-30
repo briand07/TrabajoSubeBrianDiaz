@@ -2,6 +2,6 @@
 
 namespace TrabajoSube;
 
-class TarjetaBEG extends Tarjeta {
+class TarjetaMB extends Tarjeta {
     public $tipoTarjeta = "Medio boleto";
 }
