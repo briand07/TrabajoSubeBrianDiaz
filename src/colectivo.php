@@ -23,8 +23,9 @@ class Colectivo {
         switch ($tarjeta->tipoTarjeta) {
             case 'Normal':
                 // Lógica para tarjeta Normal
-                $tarifaNormal = $this->tarifaBasica * $this->aplicarDescuento($tarjeta,$tiempo);
+                $tarifaNormal = $this->tarifaBasica * $this->aplicarDescuento($tarjeta,$tiempo) * $this->transBordos($tarjeta, $tiempo);
                 if ($tarjeta->saldo >= $this->saldoNegativo + $tarifaNormal) {
+                    $tarjeta->ultimaLinea = $this->lineaColectivo;
                     $tarjeta->viajesRealizados++;
                     $tarjeta->saldo -= $tarifaNormal;
                     $tarjeta->ultimoViaje = $tiempo;
@@ -43,8 +44,9 @@ class Colectivo {
                 }
             case 'Medio Boleto':
                 // Lógica para tarjeta Medio Boleto
-                if ($this->validarTiempo($tiempo) && $this->verificar5Min($tiempo, $tarjeta->ultimoViaje) && $tarjeta->saldo >= $this->saldoNegativo + $this->tarifaBasica * 0.5) {
-                    $tarjeta->saldo -= $this->tarifaBasica * 0.5;
+                if ($this->validarTiempo($tiempo) && $this->verificar5Min($tiempo, $tarjeta->ultimoViaje) && $tarjeta->saldo >= $this->saldoNegativo + $this->tarifaBasica * 0.5 * $this->transBordos($tarjeta, $tiempo)) {
+                    $tarjeta->ultimaLinea = $this->lineaColectivo;
+                    $tarjeta->saldo -= $this->tarifaBasica * 0.5 * $this->transBordos($tarjeta, $tiempo);
                     $tarjeta->ultimoViaje = $tiempo;
                     if ($saldoPrevio < 0 && $tarjeta->saldo > 0) {
                         $saldoNegativoCancelado = true;
@@ -52,7 +54,7 @@ class Colectivo {
                     else {
                         $saldoNegativoCancelado = false;
                     }
-                    return new boleto($this->tarifaBasica * 0.5, $tiempo, $tarjeta->tipoTarjeta, $this->lineaColectivo, $totalAbonado, $tarjeta->saldo, $tarjeta->id, $saldoNegativoCancelado);
+                    return new boleto($this->tarifaBasica * 0.5 * $this->transBordos($tarjeta, $tiempo), $tiempo, $tarjeta->tipoTarjeta, $this->lineaColectivo, $totalAbonado, $tarjeta->saldo, $tarjeta->id, $saldoNegativoCancelado);
 
                 } else {
                     // Lógica para caso no válido (fuera de tiempo, menos de 5 minutos desde el último viaje o saldo insuficiente)
@@ -71,8 +73,9 @@ class Colectivo {
                 }
             case 'Boleto Educativo Gratuito':
                 // Lógica para tarjeta Estudiantil Gratuito
+                $tarjeta->ultimaLinea = $this->lineaColectivo;
                 $descuentoMultiplicador = $this->viajesGratis($tarjeta, $tiempo);
-                $tarifaFC = $this->tarifaBasica * $descuentoMultiplicador;
+                $tarifaFC = $this->tarifaBasica * $descuentoMultiplicador * $this->transBordos($tarjeta, $tiempo);
             
                 if ($this->validarTiempo($tiempo) && $tarjeta->saldo >= $this->saldoNegativo + $tarifaFC) {
                     $tarjeta->saldo -= $tarifaFC;
@@ -148,6 +151,40 @@ class Colectivo {
         }
         else{
             $tarjeta->viajesRealizados = 0;
+            return 1;
+        }
+    }
+
+    function transBordos($tarjeta, $tiempo){
+        $diaSemana = date('N', $tiempo); 
+        $hora = date('G', $tiempo); 
+    
+        // Verificar si es de lunes a sabado y la hora está entre 7 y 22
+        if ($diaSemana >= 1 && $diaSemana <= 6 && $hora >= 7 && $hora <= 22) {
+            $horario = true;
+        } else {
+            return 1;
+        }
+
+        $diferenciaMinutos = ($tiempo - $tarjeta->ultimoViaje) / 60;
+        // Verificar si han pasado menos de 1 hora
+        if ($diferenciaMinutos < 60) {
+            $hora = true;
+        } else {
+            return 1;
+        }
+        //verificar si la linea es otra
+        if($tarjeta->ultimaLinea != $this->lineaColectivo && $tarjeta->ultimaLinea != null){
+            $linea = true;
+        }
+        else{
+            return 1;
+        }
+
+        if($horario && $hora && $linea){
+            return 0;
+        }
+        else{
             return 1;
         }
     }

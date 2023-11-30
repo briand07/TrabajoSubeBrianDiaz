@@ -19,5 +19,17 @@ class TarjetaTest extends TestCase {
 
         $this->expectException(Exception::class);
         $this->assertFalse($tarjeta->cargarSaldo(123));
+
+        $tarjeta->cargarSaldo(150);
+        $this->assertEquals($tarjeta->saldoSinAcreditar, 150);
+    }
+
+    public function testAcreditarSaldo() {
+        $tarjeta = new Tarjeta(150);
+        $this->assertEquals($tarjeta->saldo,150);
+
+        $tarjeta->cargarSaldo(150);
+        $tarjeta->acreditarSaldo();
+        $this->assertEquals($tarjeta->saldo, 300);
     }
 }

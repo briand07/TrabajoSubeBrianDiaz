@@ -8,6 +8,7 @@ class Tarjeta {
     public $saldo;
     public $saldoSinAcreditar;
     public $ultimoViaje;
+    public $ultimaLinea;
     public $viajesHoy;
     public $viajesRealizados = 1;
     public $tipoTarjeta = "Normal";
