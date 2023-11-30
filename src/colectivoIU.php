@@ -2,7 +2,7 @@
 
 namespace TrabajoSube;
 
-class ColectivoInterurbano extends Colectivo
+class ColectivoIU extends Colectivo
 {
-    public $tarifa = 300;
+    public $tarifaBasica = 300;
 }

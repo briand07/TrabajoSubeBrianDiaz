@@ -32,4 +32,24 @@ class TarjetaTest extends TestCase {
         $tarjeta->acreditarSaldo();
         $this->assertEquals($tarjeta->saldo, 300);
     }
+
+    public function testFranquicias() {
+
+        $colectivo = new colectivo(110);
+        $tarjeta = new Tarjeta(4000);
+        $tarjetaBEG = new TarjetaBEG(4000);
+        $tarjetaJubilados = new TarjetaJ(4000);
+        $tarjetaMBE = new TarjetaMB(4000);
+
+        $colectivo->pagarCon($tarjeta, 0);
+        $this->assertEquals($tarjeta->saldo, 3815);
+        $tarjeta->viajesRealizados = 30;
+        $colectivo->pagarCon($tarjeta, 0);
+        $this->assertEquals($tarjeta->saldo, 3667);
+        $tarjeta->viajesRealizados = 80;
+        $colectivo->pagarCon($tarjeta, 0);
+        $this->assertEquals($tarjeta->saldo, 3528.25);
+        $colectivo->pagarCon($tarjeta, 2678400);
+        $this->assertEquals($tarjeta->saldo, 3343.25);
+    }
 }
