@@ -18,53 +18,58 @@ class Colectivo {
         $saldoPrevio = $tarjeta->saldo;
         $totalAbonado = $tarjeta->acreditarSaldo();
         $nuevoSaldo = $tarjeta->saldo;
-    
+        
         // Verificar el tipo de tarjeta
         switch ($tarjeta->tipoTarjeta) {
-            case 'N':
+            case 'Normal':
                 // Lógica para tarjeta Normal
-                if ($tarjeta->saldo >= $this->saldoNegativo + $this->tarifaBasica) {
-                    $tarifaNormal = $this->tarifaBasica * $this->aplicarDescuento($tarjeta->viajesRealizados);
-                    if(date('Y-m', $tarjeta->ultimoViaje) === date('Y-m', $tiempo)){
-                        $tarjeta->viajesRealizados++;
-                    } else {
-                        $tarjeta->viajesRealizados = 1;
-                    }
+                $tarifaNormal = $this->tarifaBasica * $this->aplicarDescuento($tarjeta,$tiempo);
+                if ($tarjeta->saldo >= $this->saldoNegativo + $tarifaNormal) {
+                    $tarjeta->viajesRealizados++;
                     $tarjeta->saldo -= $tarifaNormal;
                     $tarjeta->ultimoViaje = $tiempo;
                     
+                    if ($saldoPrevio < 0 && $tarjeta->saldo > 0) {
+                        $saldoNegativoCancelado = true;
+                    }
+                    else {
+                        $saldoNegativoCancelado = false;
+                    }
+
+                    return new boleto($tarifaNormal, $tiempo, $tarjeta->tipoTarjeta, $this->lineaColectivo, $totalAbonado, $tarjeta->saldo, $tarjeta->id, $saldoNegativoCancelado);
                 } else {
                     // Lógica para caso no válido (fuera de tiempo o saldo insuficiente)
-                    throw new Exception("No se puede realizar el viaje con la tarjeta normal en este momento.");
+                    return false;
                 }
-                break;
-            case 'MB':
+            case 'Medio Boleto':
                 // Lógica para tarjeta Medio Boleto
-                if ($this->validarTiempo($tiempo) && $this->verificar5Min($tiempo, $tarjeta->ultimoViaje) && $tarjeta->saldo >= $this->saldoNegativo + $this->tarifaBasica) {
+                if ($this->validarTiempo($tiempo) && $this->verificar5Min($tiempo, $tarjeta->ultimoViaje) && $tarjeta->saldo >= $this->saldoNegativo + $this->tarifaBasica * 0.5) {
                     $tarjeta->saldo -= $this->tarifaBasica * 0.5;
                     $tarjeta->ultimoViaje = $tiempo;
+                    if ($saldoPrevio < 0 && $tarjeta->saldo > 0) {
+                        $saldoNegativoCancelado = true;
+                    }
+                    else {
+                        $saldoNegativoCancelado = false;
+                    }
+                    return new boleto($this->tarifaBasica * 0.5, $tiempo, $tarjeta->tipoTarjeta, $this->lineaColectivo, $totalAbonado, $tarjeta->saldo, $tarjeta->id, $saldoNegativoCancelado);
+
                 } else {
                     // Lógica para caso no válido (fuera de tiempo, menos de 5 minutos desde el último viaje o saldo insuficiente)
-                    throw new Exception("No se puede realizar el viaje con medio boleto en este momento.");
+                    return false;
                 }
-                break;
-            case 'J':
+            case 'Jubilados':
                 // Lógica para tarjeta Jubilados
-                $descuentoMultiplicador = $this->viajesGratis($tarjeta, $tiempo);
-                $tarifaFC = $this->tarifaBasica * $descuentoMultiplicador;
             
-                if ($this->validarTiempo($tiempo) && $tarjeta->saldo >= $this->saldoNegativo + $tarifaFC) {
-                    $tarjeta->saldo -= $tarifaFC;
-                    $tarjeta->viajesHoy++;
-                    $tarjeta->ultimoViaje = $tiempo;
+                if ($this->validarTiempo($tiempo)) {
+                    $saldoNegativoCancelado = false;
                     //return new boleto($tarifaFC, $tiempo, $tarjeta->tipoTarjeta, $this->lineaColectivo, $totalAbonado, $tarjeta->saldo, $tarjeta->id, $saldoNegativoCancelado);
 
                 } else {
                     // Lógica para caso no válido (fuera de tiempo o saldo insuficiente)
-                    throw new Exception("No se puede realizar el viaje con la tarjeta de jubilado en este momento.");
+                    return false;
                 }
-                break;
-            case 'EG':
+            case 'Boleto Educativo Gratuito':
                 // Lógica para tarjeta Estudiantil Gratuito
                 $descuentoMultiplicador = $this->viajesGratis($tarjeta, $tiempo);
                 $tarifaFC = $this->tarifaBasica * $descuentoMultiplicador;
@@ -73,13 +78,17 @@ class Colectivo {
                     $tarjeta->saldo -= $tarifaFC;
                     $tarjeta->viajesHoy++;
                     $tarjeta->ultimoViaje = $tiempo;
-                    //return new boleto($tarifaFC, $tiempo, $tarjeta->tipoTarjeta, $this->lineaColectivo, $totalAbonado, $tarjeta->saldo, $tarjeta->id, $saldoNegativoCancelado);
-
+                    if ($saldoPrevio < 0 && $tarjeta->saldo > 0) {
+                        $saldoNegativoCancelado = true;
+                    }
+                    else {
+                        $saldoNegativoCancelado = false;
+                    }
+                    return new boleto($tarifaFC, $tiempo, $tarjeta->tipoTarjeta, $this->lineaColectivo, $totalAbonado, $tarjeta->saldo, $tarjeta->id, $saldoNegativoCancelado);
                 } else {
                     // Lógica para caso no válido (fuera de tiempo o saldo insuficiente)
-                    throw new Exception("No se puede realizar el viaje con la tarjeta estudiantil gratuito en este momento.");
+                    return false;
                 }
-                break;
             default:
                 // Tipo de tarjeta no reconocido
                 throw new Exception("Tipo de tarjeta no válido");
@@ -115,25 +124,31 @@ class Colectivo {
     function viajesGratis($tarjeta, $tiempo) {
         // Verificar si hay al menos un viaje gratis disponible
         if(date('Y-m-d', $tarjeta->ultimoViaje) === date('Y-m-d', $tiempo)){
-            if ($tarjeta->viajesHoy >= 1) {
-                $tarjeta->viajesHoy -= 1;
+            if ($tarjeta->viajesHoy <= 1) {
                 return 0;//Para multiplicar la tarifa por 0
             } else {
                 return 1;
             }
         }
         else{
+            $tarjeta->viajesHoy = 0;
             return 0;
         }
     }
 
-    function aplicarDescuento($viajesEnElMes) {
-        if ($viajesEnElMes >= 30 && $viajesEnElMes < 80) {
-            return 0.8; // Descuento del 20%
-        } elseif ($viajesEnElMes >= 80) {
-            return 0.75; // Descuento del 25%
-        } else {
-            return 1; // Sin descuento
+    function aplicarDescuento($tarjeta, $tiempo) {
+        if(date('Y-m', $tarjeta->ultimoViaje) === date('Y-m', $tiempo)){
+            if ($tarjeta->viajesRealizados >= 30 && $tarjeta->viajesRealizados < 80) {
+                return 0.8; // Descuento del 20%
+            } elseif ($tarjeta->viajesRealizados >= 80) {
+                return 0.75; // Descuento del 25%
+            } else {
+                return 1; // Sin descuento
+            }
+        }
+        else{
+            $tarjeta->viajesRealizados = 0;
+            return 1;
         }
     }
 }
