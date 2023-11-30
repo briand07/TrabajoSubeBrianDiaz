@@ -14,7 +14,7 @@ class Colectivo {
         $this->lineaColectivo = $lineaColectivo;
     }
 
-    public function pagarCon(Tarjeta $tarjeta, $tiempo) {
+    public function pagarCon($tarjeta, $tiempo) {
         $saldoPrevio = $tarjeta->saldo;
         $totalAbonado = $tarjeta->acreditarSaldo();
         $nuevoSaldo = $tarjeta->saldo;
@@ -44,7 +44,7 @@ class Colectivo {
                 }
             case 'Medio Boleto':
                 // Lógica para tarjeta Medio Boleto
-                if ($this->validarTiempo($tiempo) && $this->verificar5Min($tiempo, $tarjeta->ultimoViaje) && $tarjeta->saldo >= $this->saldoNegativo + $this->tarifaBasica * 0.5 * $this->transBordos($tarjeta, $tiempo)) {
+                if ($this->validarTiempo($tiempo) && $this->verificar5Min($tarjeta, $tiempo) && $tarjeta->saldo >= $this->saldoNegativo + $this->tarifaBasica * 0.5 * $this->transBordos($tarjeta, $tiempo)) {
                     $tarjeta->ultimaLinea = $this->lineaColectivo;
                     $tarjeta->saldo -= $this->tarifaBasica * 0.5 * $this->transBordos($tarjeta, $tiempo);
                     $tarjeta->ultimoViaje = $tiempo;
@@ -79,7 +79,7 @@ class Colectivo {
             
                 if ($this->validarTiempo($tiempo) && $tarjeta->saldo >= $this->saldoNegativo + $tarifaFC) {
                     $tarjeta->saldo -= $tarifaFC;
-                    $tarjeta->viajesHoy++;
+                    $tarjeta->viajesHoy += 1;
                     $tarjeta->ultimoViaje = $tiempo;
                     if ($saldoPrevio < 0 && $tarjeta->saldo > 0) {
                         $saldoNegativoCancelado = true;
@@ -99,11 +99,11 @@ class Colectivo {
     }
     
 
-    function verificar5Min($tiempo, $ultimoViaje) {
-    
+    function verificar5Min($tarjeta, $tiempo) {
+
         // Calcular la diferencia en minutos entre el tiempo actual y el último viaje
-        $diferenciaMinutos = ($tiempo - $ultimoViaje) / 60;
-    
+        $diferenciaMinutos = ($tiempo - $tarjeta->ultimoViaje) / 60;
+
         // Verificar si han pasado más de 5 minutos
         if ($diferenciaMinutos > 5) {
             return true;

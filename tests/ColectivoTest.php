@@ -15,11 +15,29 @@ class ColectivoTest extends TestCase{
         $colectivo = new Colectivo(100);
         $this->assertEquals($colectivo->lineaColectivo, 100);
 
-
-
     }
 
+    public function testPagarCon() {
 
+        // En esta función se va a testear el funcionamiento de pagarCon.
+
+        $colectivo = new colectivo(100);
+        $tarjeta = new tarjeta(200);
+
+        $colectivo->pagarCon($tarjeta, 0);
+        $this->assertEquals($tarjeta->saldo, 15);
+        $colectivo->pagarCon($tarjeta, 0);
+        $this->assertEquals($tarjeta->saldo, -170);
+        $tarjeta->cargarSaldo(500);
+        $this->assertEquals($tarjeta->saldo, -170);
+        $colectivo->pagarCon($tarjeta, 0);
+        $this->assertEquals($tarjeta->saldo, 145);
+
+        $colectivo->pagarCon($tarjeta, 0);
+        $colectivo->pagarCon($tarjeta, 0);
+        $colectivo->pagarCon($tarjeta, 0);
+        $this->assertFalse($colectivo->pagarCon($tarjeta, 0));
+    }
 
     public function testTransbordos() {
 
@@ -57,7 +75,7 @@ class ColectivoTest extends TestCase{
         /* En esta función se va a testear el funcionamiento de check5Min. */
 
         $colectivo = new colectivo(100);
-        $tarjeta = new TarjetaJ(4000);
+        $tarjeta = new TarjetaMB(4000);
 
         $colectivo->pagarcon($tarjeta, 0);
         $this->assertFalse($colectivo->verificar5Min($tarjeta,299));
@@ -101,16 +119,25 @@ class ColectivoTest extends TestCase{
         se mantenga actualizada al pagar un boleto. */
 
         $colectivo = new colectivo(100);
-        $tarjeta = new tarjetaJ(4000);
+        $tarjeta = new tarjetaBEG(4000);
 
         $colectivo->pagarCon($tarjeta, 43200); //Día 0
-        $this->assertTrue($colectivo->viajesGratis($tarjeta, 43200));
+        $this->assertEquals($colectivo->viajesGratis($tarjeta, 43200), 0);
         $colectivo->pagarCon($tarjeta, 43200);
-        $this->assertFalse($colectivo->viajesGratis($tarjeta, 43200));
+        $this->assertEquals($colectivo->viajesGratis($tarjeta, 43200), 1);
         $colectivo->pagarCon($tarjeta, 43200);
-        $this->assertFalse($colectivo->viajesGratis($tarjeta, 43200));
+        $this->assertEquals($colectivo->viajesGratis($tarjeta, 43200), 1);
         $colectivo->pagarCon($tarjeta, 86400); //Día 1
         $this->assertEquals($tarjeta->viajesHoy, 1);
-        $this->assertTrue($colectivo->viajesGratis($tarjeta, 86400));
+        $this->assertEquals($colectivo->viajesGratis($tarjeta, 129600), 0);
+    }
+
+    public function testColectivoInterUrbano() {
+
+        $colectivo = new ColectivoInterUrbano(100);
+        $tarjeta = new tarjeta(300);
+
+        $colectivo->pagarCon($tarjeta, 0);
+        $this->assertEquals($tarjeta->saldo, 0);
     }
 }

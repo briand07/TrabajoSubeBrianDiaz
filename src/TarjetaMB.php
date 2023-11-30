@@ -3,5 +3,5 @@
 namespace TrabajoSube;
 
 class TarjetaMB extends Tarjeta {
-    public $tipoTarjeta = "Medio boleto";
+    public $tipoTarjeta = "Medio Boleto";
 }
